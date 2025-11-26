@@ -151,8 +151,22 @@ def create_and_fill_db(db_records):
     print(f"БД инициализирована")
     conn.close()
 
+
 if __name__ == "__main__":
     df, db_records = generate_synthetic_loan_data(n_rows=5000, random_state=42)
     df.to_csv("data/synthetic_loan_approval.csv", index=False)
     create_and_fill_db(db_records)
     print("Данные сгенерированы")
+    conn = sqlite3.connect("data/credit_bureau.db")
+    cur = conn.cursor()
+    cur.execute("SELECT full_name, birth_date, credit_score FROM credit_scores ORDER BY RANDOM() LIMIT 5")
+    examples = cur.fetchall()
+    conn.close()
+
+    for i, (name, dob, score) in enumerate(examples, 1):
+        parts = name.split()
+        lname = parts[0]
+        fname = " ".join(parts[1:])
+        y, m, d = dob.split("-")
+        print(f"{i}. {lname} {fname}")
+        print(f"   Дата: {d}.{m}.{y} (Скор: {int(score)})")
